@@ -106,3 +106,5 @@ MobileBackups.trash
 tmbootpicker.efi
 .idea/
 .env
+
+saved-vm-ids.txt
