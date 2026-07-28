@@ -14,9 +14,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VM_IDS_FILE="${SCRIPT_DIR}/saved-vm-ids.txt"
 
 # onevm list devuelve una tabla con columnas: ID NAME STATE CPU RAM
-# State "running" corresponde a estado 1 (RUNNING).
+# State "runn" corresponde a estado 1 (RUNNING).
 # Filtramos solo las VMs que están corriendo y extraemos el ID (primera columna).
-onevm list | awk 'NR>1 && $4=="running" {print $1}' > "${VM_IDS_FILE}"
+onevm list | awk 'NR>1 && $5=="runn" {print $1}' > "${VM_IDS_FILE}"
 
 echo "IDs guardados en ${VM_IDS_FILE}:"
 cat "${VM_IDS_FILE}"
