@@ -43,3 +43,23 @@ for vm_id in "${VM_IDS[@]}"; do
 done
 
 echo "Todas las VMs guardadas han sido apagadas."
+
+echo "Esperando a que las VMs se apagan realmente..."
+
+while true; do
+    all_shut=true
+    for vm_id in "${VM_IDS[@]}"; do
+        state=$(onevm list | awk -v id="${vm_id}" 'NR>1 && $1==id {print $5}')
+        if [[ "${state}" != "shut" ]]; then
+            all_shut=false
+            break
+        fi
+    done
+
+    if ${all_shut}; then
+        echo "Todas las VMs están en estado shut."
+        break
+    fi
+
+    sleep 5
+done
