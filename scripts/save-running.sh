@@ -13,10 +13,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VM_IDS_FILE="${SCRIPT_DIR}/saved-vm-ids.txt"
 
-# onevm list devuelve una tabla con columnas: ID NAME STATE CPU RAM
-# State "runn" corresponde a estado 1 (RUNNING).
-# Filtramos solo las VMs que están corriendo y extraemos el ID (primera columna).
-onevm list | awk 'NR>1 && $5=="runn" {print $1}' > "${VM_IDS_FILE}"
+if ! command -v jq &>/dev/null; then
+    echo "ERROR: 'jq' no está instalado. Instálalo e inténtalo de nuevo." >&2
+    exit 1
+fi
+
+onevm list --json | jq -r '.VM_POOL.VM[] | select(.STATE == "3" and .LCM_STATE == "3") | .ID' > "${VM_IDS_FILE}"
 
 echo "IDs guardados en ${VM_IDS_FILE}:"
 cat "${VM_IDS_FILE}"

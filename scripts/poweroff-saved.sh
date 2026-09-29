@@ -31,6 +31,11 @@ if [[ ${#VM_IDS[@]} -eq 0 ]]; then
     exit 0
 fi
 
+if ! command -v jq &>/dev/null; then
+    echo "ERROR: 'jq' no está instalado. Instálalo e inténtalo de nuevo." >&2
+    exit 1
+fi
+
 echo "Apagando ${#VM_IDS[@]} máquina(s)..."
 
 for vm_id in "${VM_IDS[@]}"; do
@@ -49,8 +54,9 @@ echo "Esperando a que las VMs se apagan realmente..."
 while true; do
     all_shut=true
     for vm_id in "${VM_IDS[@]}"; do
-        state=$(onevm list | awk -v id="${vm_id}" 'NR>1 && $1==id {print $5}')
-        if [[ "${state}" != "shut" ]]; then
+        state=$(onevm list --json | jq -r --arg id "${vm_id}" \
+            '.VM_POOL.VM[] | select(.ID == $id) | .STATE')
+        if [[ "${state}" != "8" ]]; then
             all_shut=false
             break
         fi
